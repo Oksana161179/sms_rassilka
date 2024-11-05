@@ -17,6 +17,7 @@ def check_balance(login, password):#создаем функцию проверк
 
         if response.status_code == 200:#если выражение верно, то все хорошо
             response_data = response.json()
+            mb.showinfo("Баланс", f"Баланс счета {response_data["money"]}")
             return response_data["money"]#возвращаем сообщение о балансе
         else:#если ошибка
             mb.showerror("Ошибка!",f"Произошла ошибка проверки баланса {response.status_code}")
@@ -34,7 +35,11 @@ def send_sms():
     password='TCMS9L'#пароль
     sender='python2024'#подпись отправителя
     receiver = receiver_entry.get()#получаем текст из поля ввода
-    text = text_entry.get()#получаем текст из поля ввода
+    text = text_entry.get(1.0, END)#получаем текст из поля ввода от начала и до конца
+
+    if len(text) > 160:#делаем проверку, если сообщение содержит больше 160 символов, то
+        mb.showerror("Ошибка!", f"Длина вашего сообщения {len(text)}. Она не может превышать 160 символов")
+        return #выходим из функции
 
     balance = check_balance(user, password)
     if balance:#делаем проверку: если переменная balance не пустая
@@ -62,14 +67,14 @@ def send_sms():
 
 window = Tk()#создаем окно
 window.title("Отправка СМС")#задаем заголовок окну
-window.geometry("250x110")#задаем размер окну
+window.geometry("400x200")#задаем размер окну
 
-Label(text="Номер получателя: ").pack()#создаем метку
+Label(text="Номер получателя в формате 79*********: ").pack()#создаем метку
 receiver_entry = Entry()#создаем поле ввода
 receiver_entry.pack()
 
 Label(text="Введите текст СМС").pack()
-text_entry = Entry()
+text_entry = Text(height=6, width=30)#создаем многострочное текстовое поле
 text_entry.pack()
 
 send_button = Button(text="Отправить СМС", command=send_sms)#создаем кнопку
